@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><title>Roblox AFK</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#0a0e1a;--card:#121829;--line:#222c47;--tx:#e8ecf8;--mut:#8b96b8;--a:#6366f1;--b:#22d3ee;--ok:#34d399;--bad:#f87171}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:14px/1.5 "Segoe UI","Microsoft JhengHei UI",system-ui,sans-serif;color:var(--tx);padding:18px;overflow-y:auto;user-select:none;
+background:radial-gradient(800px 380px at 5% -10%,#1b2350,transparent 60%),radial-gradient(600px 380px at 110% 0,#0b3a4a,transparent 55%),var(--bg)}
+header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff}
+h1{font-size:18px;margin:0}header small{color:var(--mut)}
+.pill{margin-left:auto;padding:4px 12px;border-radius:99px;font-size:12px;border:1px solid var(--line);color:var(--mut)}
+.pill.run{color:var(--ok);border-color:#1d6b52;background:#0d2a22}
+.card{background:rgba(18,24,41,.85);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h2{font-size:12px;letter-spacing:.08em;color:var(--mut);margin:0 0 10px;text-transform:uppercase}
+.row{display:flex;align-items:center;gap:8px;margin:6px 0}
+.row .dot{width:9px;height:9px;border-radius:50%;background:var(--mut)}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}
+.row span.m{color:var(--mut);margin-left:auto;font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seg{display:flex;background:#0d1322;border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;border-radius:9px;padding:9px 6px;background:transparent;color:var(--mut);font:inherit;cursor:pointer;transition:.15s}
+.seg button.on{background:linear-gradient(135deg,var(--a),#4f46e5);color:#fff;box-shadow:0 4px 14px #4f46e555}
+.desc{color:var(--mut);font-size:12px;margin:8px 2px 0}
+label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px}
+input{width:100%;background:#0d1322;border:1px solid var(--line);border-radius:10px;padding:9px 11px;color:var(--tx);font:inherit;outline:none;user-select:text}
+input:focus{border-color:var(--a)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inl{display:flex;gap:8px}.inl input{flex:1}
+button.sm{background:#1a2340;border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:0 12px;cursor:pointer;font:inherit}
+button.sm:hover{border-color:var(--a)}
+.go{width:100%;border:0;border-radius:14px;padding:14px;font:600 16px inherit;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 8px 24px #4f46e544;transition:.15s}
+.go:hover{filter:brightness(1.1)}.go:disabled{filter:grayscale(1) brightness(.6);cursor:not-allowed;box-shadow:none}
+.go.stop{background:linear-gradient(135deg,#ef4444,#f97316)}
+body.running .cfg{opacity:.4;pointer-events:none}
+.toast{display:none;background:#2a1216;border:1px solid #7f1d1d;color:#fecaca;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:13px;user-select:text;white-space:pre-wrap}
+.mask{position:fixed;inset:0;background:#000a;display:none;place-items:center;padding:20px;backdrop-filter:blur(3px)}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;width:100%}
+.modal h3{margin:0 0 8px}.modal p{color:var(--mut);margin:6px 0}
+.steps{display:flex;gap:6px;margin:12px 0}.steps i{flex:1;height:5px;border-radius:9px;background:var(--line)}.steps i.on{background:var(--bad)}
+.proc{background:#0d1322;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:12px Consolas,monospace;color:var(--tx);margin:8px 0}
+.btns{display:flex;gap:8px;margin-top:12px}.btns button{flex:1;padding:11px;border-radius:11px;border:0;font:inherit;cursor:pointer}
+.btns .no{background:#1a2340;color:var(--tx)}.btns .yes{background:#dc2626;color:#fff}.btns .yes:disabled{opacity:.5}
+[hidden]{display:none!important}
+</style></head><body>
+<header><div class="logo">W</div><div><h1>Roblox AFK</h1><small>防閒置踢出小工具</small></div><div class="pill" id="pill">待機</div></header>
+<div class="toast" id="toast"></div>
+
+<div class="card"><h2>環境檢查</h2>
+ <div class="row"><i class="dot" id="dAhk"></i>AutoHotkey v2<span class="m" id="mAhk">檢查中…</span></div>
+ <div class="row"><i class="dot" id="dPy"></i>Python + pywinauto<span class="m" id="mPy">檢查中…</span>
+  <button class="sm" id="btnInstall" hidden style="padding:3px 10px">安裝</button></div>
+ <div class="desc" id="envHint"></div>
+ <div class="btns" style="margin-top:8px"><button class="no" id="btnRecheck" style="padding:6px">重新檢查</button></div>
+</div>
+
+<div class="cfg">
+<div class="card"><h2>模式</h2>
+ <div class="seg" data-g="mode"><button data-v="ahk" class="on">AHK（需保持焦點）</button><button data-v="pyw">pywinauto（背景）</button></div>
+ <div class="desc" id="modeDesc"></div>
+ <div id="pidBox" hidden><label>Roblox 行程 PID</label>
+  <div class="inl"><input id="pid" inputmode="numeric" placeholder="例如 12345"><button class="sm" id="btnDetect">自動偵測</button></div></div>
+</div>
+
+<div class="card"><h2>按鍵動作</h2>
+ <label>按鍵</label>
+ <input id="key" list="keys" value="w"><datalist id="keys"><option>w<option>a<option>s<option>d<option>Space<option>Left<option>Right<option>Up<option>Down<option>Enter<option>F5</datalist>
+ <label>方式</label>
+ <div class="seg" data-g="action"><button data-v="hold" class="on">持續按住</button><button data-v="tap">按幾次</button></div>
+ <div class="two">
+  <div id="holdBox"><label>按住時間（毫秒）</label><input id="hold" type="number" value="1000" min="50"></div>
+  <div id="tapBox" hidden><label>按幾次</label><input id="taps" type="number" value="1" min="1"></div>
+  <div><label>每隔幾秒執行一次</label><input id="interval" type="number" value="60" min="1"></div>
+ </div>
+</div></div>
+
+<button class="go" id="go">開始</button>
+
+<div class="mask" id="mask"><div class="modal">
+ <h3 id="mTitle"></h3><p id="mText"></p>
+ <div class="proc" id="mProc"></div>
+ <div class="steps"><i></i><i></i><i></i></div>
+ <div class="btns"><button class="no" id="mNo">取消</button><button class="yes" id="mYes"></button></div>
+</div></div>
+
+<script>
+const { invoke } = window.__TAURI__.core, { listen } = window.__TAURI__.event;
+const $ = s => document.querySelector(s);
+let mode = 'ahk', action = 'hold', env = null, info = null, step = 0;
+const DESC = {
+ ahk: '按下開始後會切到 Roblox 視窗並實際發送按鍵，期間需保持遊戲為前景。緊急停止：Ctrl+Alt+Q。',
+ pyw: '以 PostMessage 直接把按鍵送到該 PID 的視窗，不需焦點；開始後視窗縮到系統匣並受保護。'
+};
+const toast = m => { const t = $('#toast'); t.textContent = m; t.style.display = m ? 'block' : 'none'; };
+
+function setSeg(g, v) {
+  document.querySelectorAll(`.seg[data-g=${g}] button`).forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  if (g === 'mode') mode = v; else action = v;
+  render();
+}
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => setSeg(b.parentElement.dataset.g, b.dataset.v));
+
+function render() {
+  $('#modeDesc').textContent = DESC[mode];
+  $('#pidBox').hidden = mode !== 'pyw';
+  $('#holdBox').hidden = action !== 'hold';
+  $('#tapBox').hidden = action !== 'tap';
+  document.body.classList.toggle('running', !!info);
+  $('#pill').textContent = info ? '運行中' : '待機';
+  $('#pill').classList.toggle('run', !!info);
+  const ready = mode === 'ahk' ? !!env?.ahk : !!env?.pywinauto;
+  const go = $('#go');
+  go.textContent = info ? '停止' : '開始';
+  go.classList.toggle('stop', !!info);
+  go.disabled = !info && !ready;
+}
+
+async function checkEnv() {
+  $('#mAhk').textContent = $('#mPy').textContent = '檢查中…';
+  env = await invoke('check_env');
+  const set = (d, m, ok, t) => { $(d).className = 'dot ' + (ok ? 'ok' : 'bad'); $(m).textContent = t; $(m).title = t; };
+  set('#dAhk', '#mAhk', !!env.ahk, env.ahk || '未安裝 v2');
+  set('#dPy', '#mPy', !!env.pywinauto, env.pywinauto ? 'pywinauto ' + env.pywinauto : env.python ? '缺少 pywinauto' : '找不到 Python');
+  $('#btnInstall').hidden = !(env.python && !env.pywinauto);
+  $('#envHint').textContent = !env.ahk ? 'AHK 模式必須使用 v2：winget install AutoHotkey.AutoHotkey' : '';
+  render();
+}
+
+$('#btnRecheck').onclick = checkEnv;
+$('#btnInstall').onclick = async () => {
+  $('#btnInstall').textContent = '安裝中…'; toast('');
+  try { await invoke('install_pywinauto'); } catch (e) { toast(e); }
+  $('#btnInstall').textContent = '安裝'; checkEnv();
+};
+$('#btnDetect').onclick = async () => {
+  const p = await invoke('detect_roblox');
+  if (p.length) $('#pid').value = p[0]; else toast('找不到 RobloxPlayerBeta.exe，請先開啟遊戲');
+  if (p.length > 1) toast('偵測到多個 Roblox 行程：' + p.join(', ') + '（已填入第一個）');
+};
+
+$('#go').onclick = async () => {
+  toast('');
+  if (info) { await invoke('stop'); info = null; render(); return; }
+  const cfg = {
+    mode: mode === 'ahk' ? 'ahk' : 'pywinauto', key: $('#key').value.trim() || 'w', action,
+    hold_ms: +$('#hold').value || 1000, taps: +$('#taps').value || 1, interval_s: +$('#interval').value || 60,
+    pid: mode === 'pyw' ? (+$('#pid').value || null) : null
+  };
+  $('#go').disabled = true; $('#go').textContent = '啟動中…';
+  try { info = await invoke('start', { cfg }); } catch (e) { toast(e); }
+  render();
+};
+
+// ---- 三次確認結束 ----
+const TXT = [
+  ['確定要結束程式？', '目前有一個掛機腳本行程正在背景運行，結束後會一併終止。'],
+  ['再次確認', '終止後 Roblox 將不再被防閒置，約 20 分鐘無操作可能被踢出。'],
+  ['最後確認', '按下後會立即停止腳本並關閉本程式。']
+];
+function askQuit() {
+  if (!info) return invoke('quit_app');
+  step = 0; drawStep(); $('#mask').style.display = 'grid';
+}
+function drawStep() {
+  const [t, p] = TXT[step];
+  $('#mTitle').textContent = t; $('#mText').textContent = p;
+  $('#mProc').textContent = `${info.worker}  (PID ${info.worker_pid})  按鍵 ${info.key}` + (info.target_pid ? `  → 目標 PID ${info.target_pid}` : '');
+  document.querySelectorAll('.steps i').forEach((e, i) => e.classList.toggle('on', i <= step));
+  const y = $('#mYes'); y.textContent = `確認（${step + 1}/3）`; y.disabled = true; setTimeout(() => y.disabled = false, 700);
+}
+$('#mYes').onclick = () => { if (step < 2) { step++; drawStep(); } else invoke('quit_app'); };
+$('#mNo').onclick = () => $('#mask').style.display = 'none';
+
+listen('quit-requested', async () => { info = await invoke('status'); askQuit(); });
+listen('worker-exited', () => { info = null; $('#mask').style.display = 'none'; toast('腳本已結束（可能被手動停止或發生錯誤）'); render(); });
+
+checkEnv();
+</script></body></html>
