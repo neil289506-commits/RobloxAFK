@@ -152,7 +152,3 @@ Open Roblox before starting the worker. In Python / pywinauto mode, verify that 
 ### The background mode does not work
 
 Some Roblox windows or experiences may not respond to background `PostMessage` keyboard input. In that case, try AutoHotkey mode and keep Roblox in the foreground.
-
-## License
-
-No license has been specified for this repository yet. Until a license is added, all rights are reserved by the copyright holder.
